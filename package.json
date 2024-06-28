@@ -1,17 +1,17 @@
 {
-  "name": "visualcode",
-  "version": "1.0.1",
-  "productName": "visualcode",
+  "name": "copysave",
+  "version": "1.0.0",
+  "productName": "copysave",
   "license": "ISC",
+  "type": "module",
   "author": "Marc Otten",
   "main": "./app.js",
   "dependencies": {
-    "dotenv": "^16.3.1",
-    "open": "^9.1.0",
-    "request": "^2.88.2"
+    "clipboardy": "^4.0.0",
+    "nexe": "^4.0.0-rc.6"
   },
   "outputPath": "release-builds/largtype-darwin-x64/",
   "scripts": {
-    "package-mac": "nexe --build app.js -o visualcode"
+    "package-mac": "nexe --loglevel verbose --build app.js -o copysave"
   }
 }
