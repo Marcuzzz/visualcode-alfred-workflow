@@ -1,50 +1,40 @@
 import clipboardy from 'clipboardy';
 
-// Function to replace sensitive data with "loremipsum"
-function replaceSensitiveData(text) {
-    const patterns = [
-        /(["'])password\1\s*:\s*["'].*?["']/gi,
-        /(["'])key\1\s*:\s*["'].*?["']/gi,
-        /(["'])secret\1\s*:\s*["'].*?["']/gi,
-        /(["'])token\1\s*:\s*["'].*?["']/gi,
-        /(["'])clientsecret\1\s*:\s*["'].*?["']/gi,
-        /(["'])clientid\1\s*:\s*["'].*?["']/gi,
-        /(["'])password\1\s*=\s*["'].*?["']/gi,
-        /(["'])key\1\s*=\s*["'].*?["']/gi,
-        /(["'])secret\1\s*=\s*["'].*?["']/gi,
-        /(["'])token\1\s*=\s*["'].*?["']/gi,
-        /(["'])clientsecret\1\s*=\s*["'].*?["']/gi,
-        /(["'])clientid\1\s*=\s*["'].*?["']/gi,
-        /\bpassword\b\s*:\s*['"].*?['"]/gi,
-        /\bkey\b\s*:\s*['"].*?['"]/gi,
-        /\bsecret\b\s*:\s*['"].*?['"]/gi,
-        /\btoken\b\s*:\s*['"].*?['"]/gi,
-        /\bclientsecret\b\s*:\s*['"].*?['"]/gi,
-        /\bclientid\b\s*:\s*['"].*?['"]/gi,
-        /\bpassword\b\s*=\s*['"].*?['"]/gi,
-        /\bkey\b\s*=\s*['"].*?['"]/gi,
-        /\bsecret\b\s*=\s*['"].*?['"]/gi,
-        /\btoken\b\s*=\s*['"].*?['"]/gi,
-        /\bclientsecret\b\s*=\s*['"].*?['"]/gi,
-        /\bclientid\b\s*=\s*['"].*?['"]/gi
-    ];
+// Define the regex pattern
+const regex = /(secret|token|clientSecret|client)(?!.*token_uri|clientId|client_uri)\s*['"]?\s*[:=]\s*['"]?(.*?)(['"]?\s*,|\n|$)/gm;
 
-    patterns.forEach(pattern => {
-        text = text.replace(pattern, (match) => {
-            const [key, value] = match.split(':');
-            return `${key.trim()}: "loremipsum"`;
-        });
+function replacer(line, option) {
+    return line.replace(regex, (match, key, value, ending) => {
+        if (option === 'a') {
+            return `${key} = #########${ending}`;
+        } else if (option === 'b') {
+            return `${key}" : "#########${ending}`;   
+        } else {
+            return `${key}' : '#########${ending}`;
+        }
     });
-
-    return text;
 }
 
 // Read clipboard content
 clipboardy.read().then((data) => {
-    const updatedData = replaceSensitiveData(data);
+    // Split data into lines and process each line
+    const lines = data.split('\n');
+    const updatedLines = lines.map(line => {
+        if (line.includes('=')) {
+            line = replacer(line, "a");
+        } else if (line.includes('"')) {
+            line = replacer(line, "b");
+        } else {
+            line = replacer(line, "c");
+        }
+        return line;
+    });
+
+    // Join the updated lines back into a single string
+    const result = updatedLines.join('\n');
 
     // Write updated data back to clipboard
-    clipboardy.write(updatedData).then(() => {
+    clipboardy.write(result).then(() => {
         console.log('Updated data copied back to clipboard.');
     }).catch((err) => {
         console.error('Error writing to clipboard:', err);
