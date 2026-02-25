@@ -1,6 +1,6 @@
 {
   "name": "visualcode",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "productName": "visualcode",
   "license": "ISC",
   "author": "Marc Otten",
@@ -12,6 +12,6 @@
   },
   "outputPath": "release-builds/largtype-darwin-x64/",
   "scripts": {
-    "package-mac": "nexe --build app.js -o visualcode"
+    "package-mac": "nexe app.js -o visualcode"
   }
 }
