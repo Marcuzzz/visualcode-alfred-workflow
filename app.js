@@ -1,6 +1,7 @@
 require('dotenv').config();
 const defaultWDS = "~/Documents/projects,~/Documents".split(',');
 const WDS = process.env.wds.split(',') || defaultWDS;
+const WORKSPACE_DIRS = process.env.workspace_dirs ? process.env.workspace_dirs.split(',') : [];
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -38,22 +39,55 @@ function searchFolders(directoryPath, searchTerm) {
     });
 }
 
+function searchWorkspaces(directoryPath, searchTerm) {
+  return fs.readdir(directoryPath)
+    .then(items => {
+      const workspaceFiles = items.filter(item => item.endsWith('.code-workspace'));
+      const filtered = workspaceFiles.filter(file => {
+        const name = file.replace('.code-workspace', '');
+        return name.includes(searchTerm);
+      });
+      return filtered.map(file => ({
+        title: file.replace('.code-workspace', ''),
+        fullPath: path.join(directoryPath, file)
+      }));
+    })
+    .catch(error => {
+      if (error.code === 'ENOENT' || error.code === 'ENXIO') {
+        return [];
+      }
+      throw error;
+    });
+}
+
 // Ensure that process.argv[2] is defined before using it as the searchTerm
 const searchTerm = process.argv[2] || '';
 
-Promise.all(WDS.map(directoryPath => searchFolders(directoryPath, searchTerm)))
-  .then(allFolders => {
-    const flatFolders = [].concat(...allFolders);
+const folderSearches = WDS.map(directoryPath => searchFolders(directoryPath, searchTerm));
+const workspaceSearches = WORKSPACE_DIRS.map(directoryPath => searchWorkspaces(directoryPath, searchTerm));
 
-    console.log(JSON.stringify({
-      "items": flatFolders.map(folder => ({
-        title: folder.title,
-        subtitle: `Open folder ...`,
-        valid: true,
-        arg: `${folder.fullPath}`,
-        icon: { path: "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionIcon.icns" }
-      }))
+Promise.all([...folderSearches, ...workspaceSearches])
+  .then(allResults => {
+    const flatFolders = [].concat(...allResults.slice(0, folderSearches.length));
+    const flatWorkspaces = [].concat(...allResults.slice(folderSearches.length));
+
+    const folderItems = flatFolders.map(folder => ({
+      title: folder.title,
+      subtitle: `Open folder ...`,
+      valid: true,
+      arg: `${folder.fullPath}`,
+      icon: { path: "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionIcon.icns" }
     }));
+
+    const workspaceItems = flatWorkspaces.map(ws => ({
+      title: ws.title,
+      subtitle: `Open workspace ...`,
+      valid: true,
+      arg: `${ws.fullPath}`,
+      icon: { path: "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarDocumentsFolder.icns" }
+    }));
+
+    console.log(JSON.stringify({ "items": [...workspaceItems, ...folderItems] }));
   })
   .catch(err => {
     console.error('Error:', err.message);

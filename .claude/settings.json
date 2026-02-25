@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wds=\"/Users/marcotten/Documents/projects\" workspace_dirs=\"/tmp/test-workspaces\" node app.js my)",
+      "Bash(python3 -m json.tool)",
+      "Bash(wds=\"/Users/marcotten/Documents/projects\" node app.js visual)",
+      "Bash(node --version)",
+      "Bash(npx nexe --version)",
+      "Read(//Users/marcotten/.nexe/**)",
+      "Bash(npm install --save-dev @yao-pkg/pkg)",
+      "Bash(npm run package-mac)",
+      "Bash(wds=\"/Users/marcotten/Documents/projects\" ./visualcode visual)"
+    ],
+    "additionalDirectories": [
+      "/tmp/test-workspaces"
+    ]
+  }
+}

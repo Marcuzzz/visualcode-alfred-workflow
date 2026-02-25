@@ -187,9 +187,30 @@ end run</string>
 			<key>variable</key>
 			<string>wds</string>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string></string>
+				<key>placeholder</key>
+				<string></string>
+				<key>required</key>
+				<false/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>Fullpath to folder(s) containing .code-workspace files, comma separated</string>
+			<key>label</key>
+			<string>workspace_dirs</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>workspace_dirs</string>
+		</dict>
 	</array>
 	<key>version</key>
-	<string>1.0.1</string>
+	<string>1.0.5</string>
 	<key>webaddress</key>
 	<string>https://github.com/Marcuzzz/visualcode_alfred_actions</string>
 </dict>

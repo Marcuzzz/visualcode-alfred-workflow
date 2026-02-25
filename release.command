@@ -51,4 +51,4 @@ if [ "$2" == "--force" ]; then
 fi
 
 echo "Opening new release"
-#open "./releases/$FILENAME"
+open "./releases/$FILENAME"
